@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/beans/spring-context.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/beans/spring-tx.xsd
+">
+<context:component-scan base-package="com.atdession">
+    <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+</context:component-scan>
+<!--    引入外部文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+
+
+
+<!--    创建数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+<!--    将数据库交给spring管理-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+            <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+<!--    开启事务驱动-->
+    <tx:annotation-driven/>
+
+<!--    创建mapper注入-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.atdession.mapper"></property>
+    </bean>
+</beans>
